@@ -96,6 +96,10 @@ npm run bench:local
 - `tests/` — TypeScript tests for CLI behavior.
 - `extensions/vscode/` — editor syntax highlighting for `.0` files.
 
+## License
+
+Released under the [MIT License](./LICENSE).
+
 ## Credits
 
-The original Zero language and toolchain were developed at [vercel-labs/zero](https://github.com/vercel-labs/zero). This fork preserves the full upstream commit history; see `git log` for attribution.
+The original Zero language and toolchain were developed at [vercel-labs/zero](https://github.com/vercel-labs/zero).
