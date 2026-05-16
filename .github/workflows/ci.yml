@@ -9,9 +9,10 @@ on:
 permissions:
   contents: read
 
-# Opt into Node 24 for JS-based actions (checkout, setup-node, setup-zig).
-# Default flips on 2026-06-02; setting this now silences the deprecation
-# warning and surfaces any Node 24 incompatibilities before the cutover.
+# Opt into Node 24 for JS-based actions. actions/checkout@v6 and
+# actions/setup-node@v6 already target Node 24 natively; this env var
+# also covers mlugg/setup-zig (still on node20 upstream) and any other
+# third-party action that hasn't bumped yet.
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
@@ -20,9 +21,9 @@ jobs:
     name: macOS 15 smoke (LC_UUID regression guard)
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 24
 
@@ -44,9 +45,9 @@ jobs:
     name: Build & Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 24
 
