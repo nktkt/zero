@@ -62,17 +62,28 @@ zero doctor --json
 
 ## Validation
 
+For local development (no cloud credentials required):
+
+```bash
+./scripts/bootstrap.sh    # npm install + build native compiler
+npm run test:local        # full local-runnable test suite
+```
+
+Individual suites:
+
 ```bash
 npm run docs:test
-npm run conformance
-npm run native:test
-npm run command-contracts
+npm run conformance:local
+npm run native:test:local
+npm run command-contracts:local
 ```
+
+The bare `npm run conformance` / `native:test` / `command-contracts` variants wrap their `*:local` counterparts in a Vercel Sandbox VM and require a `VERCEL_OIDC_TOKEN`. CI runs the local variants directly on Linux and macOS, so the sandbox path is opt-in.
 
 Benchmarks run locally by default:
 
 ```bash
-npm run bench
+npm run bench:local
 ```
 
 ## Repository Layout

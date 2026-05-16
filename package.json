@@ -36,6 +36,7 @@
     "agent:demo": "node scripts/agent-repair-demo.mjs",
     "zls": "node scripts/zls.mjs",
     "test:zero": "make -C native/zero-c && npm run build:test --silent && node --test .zero/test-js/*.test.js",
+    "test:local": "npm run conformance:local && npm run native:test:local && npm run command-contracts:local && npm run wasm:runtime:smoke && npm run test:zero && npm run docs:test && npm run zls -- --self-test && npm run agent:demo && npm run test -w zero-lang",
     "test": "npm run conformance && npm run native:test && npm run wasm:runtime:smoke && npm run test:zero && npm run docs:test && npm run zls -- --self-test && npm run agent:demo && npm run test -w zero-lang",
     "zero": "bin/zero"
   },

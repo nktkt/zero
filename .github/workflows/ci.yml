@@ -10,6 +10,30 @@ permissions:
   contents: read
 
 jobs:
+  macos-smoke:
+    name: macOS 15 smoke (LC_UUID regression guard)
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Build native compiler
+        run: make -C native/zero-c
+
+      - run: npm ci
+
+      - name: Smoke + conformance + native + ts + docs + extension
+        run: npm run test:local
+
+      - name: Verify LC_UUID is emitted in darwin-arm64 executables
+        run: |
+          bin/zero build --emit exe --target darwin-arm64 examples/add.0 --out .zero/out/add-mac-ci
+          otool -l .zero/out/add-mac-ci | grep -q 'cmd LC_UUID'
+          .zero/out/add-mac-ci | grep -q 'math works'
+
   build-and-test:
     name: Build & Test
     runs-on: ubuntu-latest
