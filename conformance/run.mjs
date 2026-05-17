@@ -2040,6 +2040,13 @@ if (divmodRunArgs) {
   assert.match(run.stdout, /divmod ok/);
 }
 
+const logicOpsRunArgs = runnableExeArgs("conformance/run/pass/logic-ops.0", `${outDir}/logic-ops`);
+if (logicOpsRunArgs) {
+  await execFileAsync(zero, logicOpsRunArgs);
+  const run = await execFileAsync(`${outDir}/logic-ops`, []);
+  assert.match(run.stdout, /logic ops ok/);
+}
+
 const packageGraphJson = await execFileAsync(zero, ["graph", "--json", "conformance/check/pass/package"]);
 const packageGraph = JSON.parse(packageGraphJson.stdout);
 assert.deepEqual(packageGraph.sourceFiles.sort(), [

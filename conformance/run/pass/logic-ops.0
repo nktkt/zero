@@ -1,0 +1,13 @@
+pub fun main(world: World) -> Void raises {
+    let a: Bool = true
+    let b: Bool = false
+    if a && true {
+        if b || a {
+            if a || false {
+                if (a && b) == false {
+                    check world.out.write("logic ops ok\n")
+                }
+            }
+        }
+    }
+}
