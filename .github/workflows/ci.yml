@@ -41,6 +41,13 @@ jobs:
           otool -l .zero/out/add-mac-ci | grep -q 'cmd LC_UUID'
           .zero/out/add-mac-ci | grep -q 'math works'
 
+      - name: Verify UDIV/MSUB lowering via fizzbuzz
+        run: |
+          bin/zero build --emit exe --target darwin-arm64 examples/fizzbuzz.0 --out .zero/out/fizzbuzz-mac-ci
+          actual="$(.zero/out/fizzbuzz-mac-ci)"
+          expected=$'1\n2\nFizz\n4\nBuzz\nFizz\n7\n8\nFizz\nBuzz\n11\nFizz\n13\n14\nFizzBuzz'
+          test "$actual" = "$expected" || { echo "fizzbuzz output mismatch"; echo "actual:"; echo "$actual"; echo "expected:"; echo "$expected"; exit 1; }
+
   build-and-test:
     name: Build & Test
     runs-on: ubuntu-latest

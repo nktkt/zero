@@ -434,6 +434,14 @@ static void macho_emit_binary_w(ZBuf *text, IrBinaryOp op, unsigned dst, unsigne
     append_u32le(text, 0x4b000000u | ((rhs & 31u) << 16) | ((lhs & 31u) << 5) | (dst & 31u));
   } else if (op == IR_BIN_MUL) {
     append_u32le(text, 0x1b000000u | ((rhs & 31u) << 16) | (31u << 10) | ((lhs & 31u) << 5) | (dst & 31u));
+  } else if (op == IR_BIN_DIV) {
+    // UDIV Wdst, Wlhs, Wrhs — unsigned 32-bit division.
+    append_u32le(text, 0x1ac00800u | ((rhs & 31u) << 16) | ((lhs & 31u) << 5) | (dst & 31u));
+  } else if (op == IR_BIN_MOD) {
+    // Wdst = Wlhs - (Wlhs / Wrhs) * Wrhs, via UDIV + MSUB.
+    // Uses W10 as the temporary quotient register (callers spill W10 on demand).
+    append_u32le(text, 0x1ac00800u | ((rhs & 31u) << 16) | ((lhs & 31u) << 5) | 10u);
+    append_u32le(text, 0x1b008000u | ((rhs & 31u) << 16) | ((lhs & 31u) << 10) | ((10u & 31u) << 5) | (dst & 31u));
   }
 }
 
@@ -775,7 +783,7 @@ static bool macho_emit_value_to_reg(ZBuf *text, const IrFunction *fun, const IrV
       macho_emit_load_local_w(text, fun, reg, value->local_index, 0, frame_size);
       return true;
     case IR_VALUE_BINARY:
-      if (value->binary_op != IR_BIN_ADD && value->binary_op != IR_BIN_SUB && value->binary_op != IR_BIN_MUL) return macho_diag_at(diag, "direct AArch64 Mach-O binary operator is unsupported", value->line, value->column, "unsupported operator");
+      if (value->binary_op != IR_BIN_ADD && value->binary_op != IR_BIN_SUB && value->binary_op != IR_BIN_MUL && value->binary_op != IR_BIN_DIV && value->binary_op != IR_BIN_MOD) return macho_diag_at(diag, "direct AArch64 Mach-O binary operator is unsupported", value->line, value->column, "unsupported operator");
       if (!macho_emit_value_to_reg(text, fun, value->left, 8, frame_size, ctx, diag)) return false;
       if (!macho_emit_value_to_reg(text, fun, value->right, 9, frame_size, ctx, diag)) return false;
       macho_emit_binary_w(text, value->binary_op, reg, 8, 9);
