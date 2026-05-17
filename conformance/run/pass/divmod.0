@@ -1,0 +1,9 @@
+pub fun main(world: World) -> Void raises {
+    let q: u32 = 23_u32 / 5_u32
+    let r: u32 = 23_u32 % 5_u32
+    if q == 4_u32 {
+        if r == 3_u32 {
+            check world.out.write("divmod ok\n")
+        }
+    }
+}

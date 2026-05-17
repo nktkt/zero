@@ -2033,6 +2033,13 @@ if (helloRunArgs) {
   assert.match(run.stdout, /hello conformance/);
 }
 
+const divmodRunArgs = runnableExeArgs("conformance/run/pass/divmod.0", `${outDir}/divmod`);
+if (divmodRunArgs) {
+  await execFileAsync(zero, divmodRunArgs);
+  const run = await execFileAsync(`${outDir}/divmod`, []);
+  assert.match(run.stdout, /divmod ok/);
+}
+
 const packageGraphJson = await execFileAsync(zero, ["graph", "--json", "conformance/check/pass/package"]);
 const packageGraph = JSON.parse(packageGraphJson.stdout);
 assert.deepEqual(packageGraph.sourceFiles.sort(), [
