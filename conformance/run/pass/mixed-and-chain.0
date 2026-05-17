@@ -1,0 +1,16 @@
+// Regression: int-cmp && bool-cmp chains used to silently produce the
+// wrong answer on darwin-arm64 because IR_VALUE_BINARY staged its lhs in
+// W8, which IR_VALUE_COMPARE clobbered when evaluating the rhs.
+// See emit_macho64.c IR_VALUE_BINARY case — operands are now staged in
+// W12/W13 to step out of the COMPARE scratch range.
+pub fun main(world: World) -> Void raises {
+    let a: i32 = 1
+    let b: i32 = 1
+    let c: i32 = 1
+    let d: i32 = 1
+    let f: Bool = false
+    let t: Bool = true
+    if a == b && c == d && f == false && t == true && a == b && !f {
+        check world.out.write("mixed and chain ok\n")
+    }
+}

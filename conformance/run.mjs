@@ -2054,6 +2054,13 @@ if (unaryOpsRunArgs) {
   assert.match(run.stdout, /unary ops ok/);
 }
 
+const mixedAndChainRunArgs = runnableExeArgs("conformance/run/pass/mixed-and-chain.0", `${outDir}/mixed-and-chain`);
+if (mixedAndChainRunArgs) {
+  await execFileAsync(zero, mixedAndChainRunArgs);
+  const run = await execFileAsync(`${outDir}/mixed-and-chain`, []);
+  assert.match(run.stdout, /mixed and chain ok/);
+}
+
 const packageGraphJson = await execFileAsync(zero, ["graph", "--json", "conformance/check/pass/package"]);
 const packageGraph = JSON.parse(packageGraphJson.stdout);
 assert.deepEqual(packageGraph.sourceFiles.sort(), [

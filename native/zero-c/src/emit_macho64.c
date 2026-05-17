@@ -788,12 +788,25 @@ static bool macho_emit_value_to_reg(ZBuf *text, const IrFunction *fun, const IrV
       }
       macho_emit_load_local_w(text, fun, reg, value->local_index, 0, frame_size);
       return true;
-    case IR_VALUE_BINARY:
+    case IR_VALUE_BINARY: {
       if (value->binary_op != IR_BIN_ADD && value->binary_op != IR_BIN_SUB && value->binary_op != IR_BIN_MUL && value->binary_op != IR_BIN_DIV && value->binary_op != IR_BIN_MOD && value->binary_op != IR_BIN_AND && value->binary_op != IR_BIN_OR) return macho_diag_at(diag, "direct AArch64 Mach-O binary operator is unsupported", value->line, value->column, "unsupported operator");
-      if (!macho_emit_value_to_reg(text, fun, value->left, 8, frame_size, ctx, diag)) return false;
-      if (!macho_emit_value_to_reg(text, fun, value->right, 9, frame_size, ctx, diag)) return false;
-      macho_emit_binary_w(text, value->binary_op, reg, 8, 9);
+      // Logical &&/|| are usually composed of comparisons, and
+      // IR_VALUE_COMPARE hard-codes W8/W9 as its scratch — staging the lhs
+      // there gets clobbered while evaluating the rhs. Move the stage up to
+      // W12/W13 just for those, away from the COMPARE scratch range. The
+      // arithmetic ops keep their established W8/W9 contract so the
+      // direct-call-add darwin-arm64 byte conformance stays stable.
+      unsigned lhs_reg = 8;
+      unsigned rhs_reg = 9;
+      if (value->binary_op == IR_BIN_AND || value->binary_op == IR_BIN_OR) {
+        lhs_reg = 12;
+        rhs_reg = 13;
+      }
+      if (!macho_emit_value_to_reg(text, fun, value->left, lhs_reg, frame_size, ctx, diag)) return false;
+      if (!macho_emit_value_to_reg(text, fun, value->right, rhs_reg, frame_size, ctx, diag)) return false;
+      macho_emit_binary_w(text, value->binary_op, reg, lhs_reg, rhs_reg);
       return true;
+    }
     case IR_VALUE_COMPARE: {
       if (!value->left || !value->right) {
         return macho_diag_at(diag, "direct AArch64 Mach-O comparison requires two operands", value->line, value->column, "invalid comparison");
