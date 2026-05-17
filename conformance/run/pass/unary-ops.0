@@ -1,0 +1,18 @@
+pub fun main(world: World) -> Void raises {
+    let x: i32 = 7
+    let y: i32 = -x
+    let expect: i32 = 0 - 7
+    let neg5: i32 = -5
+    let expect5: i32 = 0 - 5
+    if y == expect {
+        if neg5 == expect5 {
+            let f: Bool = false
+            let t: Bool = true
+            if !f {
+                if !t == false {
+                    check world.out.write("unary ops ok\n")
+                }
+            }
+        }
+    }
+}

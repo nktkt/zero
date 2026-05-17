@@ -521,6 +521,33 @@ static Expr *parse_unary(Parser *parser) {
     expr->left = parse_unary(parser);
     return expr;
   }
+  if (match(parser, "!")) {
+    // Desugar `!x` to `x == false` — keeps the parser change tiny and lets the
+    // existing comparison + Bool literal codegen carry the work.
+    Token *op = previous(parser);
+    Expr *operand = parse_unary(parser);
+    Expr *binary = new_expr(EXPR_BINARY, op);
+    binary->text = z_strdup("==");
+    binary->left = operand;
+    Expr *false_lit = new_expr(EXPR_BOOL, op);
+    false_lit->bool_value = false;
+    binary->right = false_lit;
+    return binary;
+  }
+  if (match(parser, "-")) {
+    // Desugar `-x` to `0 - x` for numeric negation. Includes negative literals
+    // like `-5`, which become `0 - 5`. Suboptimal codegen but functionally
+    // correct; a later pass can fold the constant.
+    Token *op = previous(parser);
+    Expr *operand = parse_unary(parser);
+    Expr *binary = new_expr(EXPR_BINARY, op);
+    binary->text = z_strdup("-");
+    Expr *zero_lit = new_expr(EXPR_NUMBER, op);
+    zero_lit->text = z_strdup("0");
+    binary->left = zero_lit;
+    binary->right = operand;
+    return binary;
+  }
   return parse_postfix(parser);
 }
 

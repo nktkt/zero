@@ -2047,6 +2047,13 @@ if (logicOpsRunArgs) {
   assert.match(run.stdout, /logic ops ok/);
 }
 
+const unaryOpsRunArgs = runnableExeArgs("conformance/run/pass/unary-ops.0", `${outDir}/unary-ops`);
+if (unaryOpsRunArgs) {
+  await execFileAsync(zero, unaryOpsRunArgs);
+  const run = await execFileAsync(`${outDir}/unary-ops`, []);
+  assert.match(run.stdout, /unary ops ok/);
+}
+
 const packageGraphJson = await execFileAsync(zero, ["graph", "--json", "conformance/check/pass/package"]);
 const packageGraph = JSON.parse(packageGraphJson.stdout);
 assert.deepEqual(packageGraph.sourceFiles.sort(), [
