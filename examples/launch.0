@@ -1,0 +1,15 @@
+// launch: count down 5..1 and print "go!".
+// Stays inside the darwin-arm64 direct backend MVP: while-loops over a
+// counter, no modulo, no helpers that take World, no std.args/std.fs.
+
+pub fun main(world: World) -> Void raises {
+    let mut n: u8 = 5_u8
+    while n > 0_u8 {
+        let mut digit: [1]u8 = [0_u8]
+        digit[0] = n + 0x30_u8
+        check world.out.write(digit)
+        check world.out.write("...")
+        n = n - 1_u8
+    }
+    check world.out.write("go!\n")
+}
